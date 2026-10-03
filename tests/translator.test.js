@@ -60,6 +60,17 @@ test('Engine: cleanOutput removes labels, markdown, and quotes across languages'
   assert.strictEqual(cleanOutput('Spanish: Buenos días\nExplanation: Morning greeting', 'spanish'), 'Buenos días');
   assert.strictEqual(cleanOutput('Translation: Ciao mondo', 'italian'), 'Ciao mondo');
   assert.strictEqual(cleanOutput('French: "Bonjour le monde"', 'french'), 'Bonjour le monde');
+  assert.strictEqual(cleanOutput('ગુજરાતીમાં અનુવાદઃ આ વાત તો સાચી છે.', 'gujarati'), 'આ વાત તો સાચી છે.');
+  assert.strictEqual(cleanOutput('गूज्लिश, તો તે તમારા માટે પણ સરળ છે.', 'gujlish'), 'તો તે તમારા માટે પણ સરળ છે.');
+});
+
+// 3b. Phonetic Transliteration
+test('Transliteration: converts Indic scripts to conversational Gujlish & Hinglish', async () => {
+  const { gujaratiToGujlish, devanagariToHinglish } = await import('../src/translator/transliterate.js');
+  const guj = gujaratiToGujlish('તો તે તમારા માટે પણ સરળ છે.');
+  assert.ok(guj.includes('tamara mate pan saral chhe'));
+  const hin = devanagariToHinglish('यह आपके लिए भी आसान है।');
+  assert.ok(hin.includes('aapke liye'));
 });
 
 // 4. Runtime Caller Overrides & Identity
@@ -88,6 +99,16 @@ await testAsync('Engine: model translation via neural LLM', async () => {
   assert.strictEqual(res.provider, 'model');
   assert.ok(res.translated.length > 0);
   assert.ok(res.latency_ms > 0);
+});
+
+await testAsync('Engine: translates English to conversational Gujlish (Latin script)', async () => {
+  const res = await translateText({
+    text: 'Got it, so it is easy for you as well!',
+    target_lang: 'gujlish'
+  });
+  assert.strictEqual(res.provider, 'model');
+  assert.ok(res.translated.length > 0);
+  assert.strictEqual(detectLanguage(res.translated), 'latin');
 });
 
 // 6. MCP Protocol Tests

@@ -27,6 +27,14 @@ The **Translator Tool** (`translate`) is an open, generic translation and locali
 >      - STRICTLY FORBIDDEN: `<option>Translate and send: "Ji, jaldi aa ja! 😄"</option>` (NEVER draft foreign words inside options!)
 >    - When a message needs to be sent or shown in a specific target language or dialect, invoke the `translate` tool (`target_lang: "..."`).
 >    - Leave all translation, transliteration, and localization entirely to the translator tool.
+> 4. **MANDATORY OUTBOUND SENDING PROTOCOL (`send_message`, `send_email`)**:
+>    - When sending an outbound message to a contact in their language or dialect:
+>      1. Call `translate(text: "<english_draft>", target_lang: "<contact_language>")`.
+>      2. In the subsequent `send_message` (or `send_email`) tool call, the `message` argument MUST BE the exact `translated` string returned by the `translate` tool!
+>      3. **STRICTLY FORBIDDEN**: NEVER pass your English draft into `send_message`. The external contact expects the message in their language; sending English defeats translation!
+>      4. In your summary response to your operator in Styx chat, report the translation clearly:
+>         - English draft: "..."
+>         - Translated message sent: "<exact translated string from tool>"
 
 ---
 

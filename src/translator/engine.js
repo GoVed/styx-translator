@@ -1,6 +1,7 @@
 import config from '../config.js';
 import logger from '../utils/logger.js';
 import { loadGlossary, normalize } from './dictionary.js';
+import { gujaratiToGujlish, devanagariToHinglish } from './transliterate.js';
 
 /**
  * Detects common writing scripts and alphabet families via Unicode ranges.
@@ -53,7 +54,8 @@ export function cleanOutput(raw, targetLang, originalText = '') {
   cleaned = cleaned
     .replace(/^["'`]+|["'`]+$/g, '')
     .trim()
-    .replace(/^([A-Za-z]+(\s+[A-Za-z]+)?\s*:\s*)/i, '')
+    .replace(/^([^\s:ઃ]+(\s+[^\s:ઃ]+)*\s*[:ઃ]\s*)/u, '')
+    .replace(/^(गूज्लिश|gujlish|hinglish|હિંગ્લિશ|ગુજ્લિશ)[,:\s]+/iu, '')
     .trim()
     .replace(/^["'`]+|["'`]+$/g, '')
     .replace(/\s*(Note|Explanation|Breakdown|Pronunciation):[\s\S]*$/i, '')
@@ -220,9 +222,14 @@ export async function translateText({ text, target_lang, source_lang = 'auto', t
     };
   }
 
+  // Map Romanized dialects to core Indic languages for the neural model
+  let modelTarget = target;
+  if (target === 'gujlish') modelTarget = 'gujarati';
+  else if (target === 'hinglish') modelTarget = 'hindi';
+
   // 2. Neural Model Translation (Ollama or OpenAI-compatible)
   try {
-    const { system, prompt, stop } = buildPrompt(text, target, detectedSource, tone);
+    const { system, prompt, stop } = buildPrompt(text, modelTarget, detectedSource, tone);
     let rawOutput = '';
 
     if (config.backend === 'openai_compatible') {
@@ -231,7 +238,15 @@ export async function translateText({ text, target_lang, source_lang = 'auto', t
       rawOutput = await callOllama(system, prompt, stop);
     }
 
-    const translated = cleanOutput(rawOutput, target, text);
+    let translated = cleanOutput(rawOutput, modelTarget, text);
+
+    // If Romanized dialect requested, transliterate Indic script to Latin
+    if (target === 'gujlish' && (detectLanguage(translated) === 'gujarati' || /[\u0A80-\u0AFF]/.test(translated))) {
+      translated = gujaratiToGujlish(translated);
+    } else if (target === 'hinglish' && (detectLanguage(translated) === 'devanagari' || /[\u0900-\u097F]/.test(translated))) {
+      translated = devanagariToHinglish(translated);
+    }
+
     return {
       translated: translated || text,
       source_lang: detectedSource,
