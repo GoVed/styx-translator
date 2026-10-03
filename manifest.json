@@ -3,7 +3,7 @@
   "display_name": "Universal Multi-Language Translator",
   "version": "1.1.0",
   "description": "High-performance, generic multilingual translator supporting 50+ languages, conversational dialects (Gujlish, Hinglish, etc.), custom user glossaries, and pluggable backends (Ollama, vLLM, OpenAI).",
-  "container_name": "styx-translator-connector",
+  "container_name": "syndae-translator-connector",
   "port": 8772,
   "protocol": "translator",
   "instructions_file": "instructions.md",

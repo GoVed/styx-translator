@@ -29,7 +29,7 @@ export async function handleMcpRequest(rpcRequest) {
           tools: { listChanged: false }
         },
         serverInfo: {
-          name: 'styx-translator',
+          name: 'syndae-translator',
           version: '1.0.0'
         }
       }

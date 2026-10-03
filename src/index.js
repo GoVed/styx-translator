@@ -8,8 +8,8 @@ import { translateText } from './translator/engine.js';
 const program = new Command();
 
 program
-  .name('styx-translator')
-  .description('Universal Multi-Language Neural Translator for Styx Agent OS')
+  .name('syndae-translator')
+  .description('Universal Multi-Language Neural Translator for Syndae Agent OS')
   .version('1.1.0');
 
 program

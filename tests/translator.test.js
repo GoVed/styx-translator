@@ -117,11 +117,11 @@ test('Transliteration: converts non-Latin scripts to Latin across languages and 
 // 4. Runtime Caller Overrides & Identity
 await testAsync('Engine: runtime dynamic glossary override for brand terms', async () => {
   const res = await translateText({
-    text: 'Styx Agent OS',
+    text: 'Syndae Agent OS',
     target_lang: 'french',
-    glossary: { 'Styx Agent OS': 'Système Styx' }
+    glossary: { 'Syndae Agent OS': 'Système Syndae' }
   });
-  assert.strictEqual(res.translated, 'Système Styx');
+  assert.strictEqual(res.translated, 'Système Syndae');
   assert.strictEqual(res.provider, 'runtime_glossary');
 });
 
@@ -178,7 +178,7 @@ test('MCP: definitions schema is universal', () => {
 await testAsync('MCP: initialize handshake', async () => {
   const res = await handleMcpRequest({ jsonrpc: '2.0', id: 1, method: 'initialize' });
   assert.strictEqual(res.result.protocolVersion, '2024-11-05');
-  assert.strictEqual(res.result.serverInfo.name, 'styx-translator');
+  assert.strictEqual(res.result.serverInfo.name, 'syndae-translator');
 });
 
 await testAsync('MCP: tools/list returns universal translate tool', async () => {

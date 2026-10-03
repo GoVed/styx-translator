@@ -1,7 +1,7 @@
 # Universal Multi-Language Translator Tool Instructions
 
 ## Overview
-The **Translator Tool** (`translate`) is an open, generic translation and localization service for Styx Agent OS. It is designed to serve operators and users globally across **50+ languages**, formal & colloquial communication styles, and customized regional dialects:
+The **Translator Tool** (`translate`) is an open, generic translation and localization service for Syndae Agent OS. It is designed to serve operators and users globally across **50+ languages**, formal & colloquial communication styles, and customized regional dialects:
 
 1. **Global Languages**: English, Spanish, French, German, Chinese (Simplified/Traditional), Japanese, Korean, Arabic, Russian, Portuguese, Italian, Dutch, Hindi, Bengali, etc.
 2. **Colloquial & Transliterated Dialects**:
@@ -32,7 +32,7 @@ The **Translator Tool** (`translate`) is an open, generic translation and locali
 >      1. Call `translate(text: "<english_draft>", target_lang: "<contact_language>")`.
 >      2. In the subsequent `send_message` (or `send_email`) tool call, the `message` argument MUST BE the exact `translated` string returned by the `translate` tool!
 >      3. **STRICTLY FORBIDDEN**: NEVER pass your English draft into `send_message`. The external contact expects the message in their language; sending English defeats translation!
->      4. In your summary response to your operator in Styx chat, report the translation clearly:
+>      4. In your summary response to your operator in Syndae chat, report the translation clearly:
 >         - English draft: "..."
 >         - Translated message sent: "<exact translated string from tool>"
 
@@ -77,7 +77,7 @@ The **Translator Tool** (`translate`) is an open, generic translation and locali
   - `"formal"`: Respectful and polite grammar.
   - `"business"`: Professional enterprise terminology.
   - `"slang"`: Colloquial slang.
-- **`glossary`** *(object, optional)*: Key-value terms to preserve or enforce verbatim (e.g., `{"Styx": "Styx", "Agent OS": "Agent OS"}`).
+- **`glossary`** *(object, optional)*: Key-value terms to preserve or enforce verbatim (e.g., `{"Syndae": "Syndae", "Agent OS": "Agent OS"}`).
 - **`context`** *(object or string, optional)*: Sociolinguistic and cultural context. Unlike English, foreign languages change grammar, pronouns, and verb conjugations based on honorifics and gender:
   - `formality` *(string)*: `"respectful"` / `"formal"` / `"honorific"` (use `tame` in Gujarati, `aap` in Hindi, `vous` in French, `Usted` in Spanish, `Sie` in German) vs `"casual"` / `"informal"` / `"peer"` (use `tu` / `tum` / `du`).
   - `recipient_gender` *(string)*: `"female"` or `"male"` (governs 2nd-person gendered verbs and adjectives).

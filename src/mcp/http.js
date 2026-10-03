@@ -27,7 +27,7 @@ export function startHttpServer() {
   app.get('/health', (req, res) => {
     res.json({
       status: 'healthy',
-      service: 'styx-translator',
+      service: 'syndae-translator',
       version: '1.1.0',
       uptime: process.uptime()
     });
@@ -36,7 +36,7 @@ export function startHttpServer() {
   // 2. Status & Configuration
   app.get('/status', (req, res) => {
     res.json({
-      service: 'styx-translator',
+      service: 'syndae-translator',
       backend: config.backend,
       model: config.translationModel,
       ollama_url: config.ollamaBaseUrl,
@@ -48,7 +48,7 @@ export function startHttpServer() {
     });
   });
 
-  // 3. Instructions endpoint for Styx auto-ingestion
+  // 3. Instructions endpoint for Syndae auto-ingestion
   app.get('/instructions', (req, res) => {
     try {
       if (fs.existsSync(config.instructionsPath)) {
@@ -123,7 +123,7 @@ export function startHttpServer() {
   const server = app.listen(config.port, config.host, () => {
     logger.info(
       { port: config.port, backend: config.backend, model: config.translationModel },
-      'Styx Universal Multi-Language Translator Server listening'
+      'Syndae Universal Multi-Language Translator Server listening'
     );
   });
 
