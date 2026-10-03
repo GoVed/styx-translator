@@ -64,13 +64,54 @@ test('Engine: cleanOutput removes labels, markdown, and quotes across languages'
   assert.strictEqual(cleanOutput('गूज्लिश, તો તે તમારા માટે પણ સરળ છે.', 'gujlish'), 'તો તે તમારા માટે પણ સરળ છે.');
 });
 
-// 3b. Phonetic Transliteration
-test('Transliteration: converts Indic scripts to conversational Gujlish & Hinglish', async () => {
-  const { gujaratiToGujlish, devanagariToHinglish } = await import('../src/translator/transliterate.js');
+// 3b. Phonetic Transliteration for All Global Latin-Written Dialects
+test('Transliteration: converts non-Latin scripts to Latin across languages and dialects', async () => {
+  const {
+    transliterateText,
+    gujaratiToGujlish,
+    devanagariToHinglish,
+    bengaliToBanglish,
+    dravidianToLatin,
+    romanizeHangul,
+    romanizeKana,
+    romanizeCyrillic,
+    romanizeGreek,
+    romanizeArabic
+  } = await import('../src/translator/transliterate.js');
+
+  // 1. Indic scripts
   const guj = gujaratiToGujlish('તો તે તમારા માટે પણ સરળ છે.');
   assert.ok(guj.includes('tamara mate pan saral chhe'));
+
   const hin = devanagariToHinglish('यह आपके लिए भी आसान है।');
   assert.ok(hin.includes('aapke liye'));
+
+  const ben = bengaliToBanglish('আমি তোমাকে ভালোবাসি');
+  assert.ok(ben.includes('bhalobasi') || ben.includes('bhalaubasi') || ben.includes('ami') || ben.includes('aami'));
+
+  const tam = dravidianToLatin('வணக்கம்');
+  assert.ok(tam.includes('vanakkam'));
+
+  // 2. East Asian scripts
+  const kor = romanizeHangul('안녕하세요');
+  assert.strictEqual(kor, 'annyeonghaseyo');
+
+  const jpn = romanizeKana('こんにちは、カタカナ');
+  assert.ok(jpn.includes('katakana'));
+
+  // 3. Mediterranean & Slavic scripts
+  const cyr = romanizeCyrillic('Привет мир');
+  assert.strictEqual(cyr, 'Privet mir');
+
+  const grk = romanizeGreek('Γειά σου κόσμε');
+  assert.ok(grk.toLowerCase().includes('geia'));
+
+  const ara = romanizeArabic('مرحبا');
+  assert.ok(ara.includes('mrhba'));
+
+  // 4. Universal dispatcher transliterateText
+  assert.strictEqual(transliterateText('Привет мир', 'cyrillic_latin'), 'Privet mir');
+  assert.strictEqual(transliterateText('안녕하세요', 'korean_latin'), 'annyeonghaseyo');
 });
 
 // 4. Runtime Caller Overrides & Identity

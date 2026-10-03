@@ -1,7 +1,11 @@
 import config from '../config.js';
 import logger from '../utils/logger.js';
 import { loadGlossary, normalize } from './dictionary.js';
-import { gujaratiToGujlish, devanagariToHinglish } from './transliterate.js';
+import {
+  transliterateText,
+  isRomanizedDialect,
+  DIALECT_TO_CORE_LANG
+} from './transliterate.js';
 
 /**
  * Detects common writing scripts and alphabet families via Unicode ranges.
@@ -49,13 +53,16 @@ export function cleanOutput(raw, targetLang, originalText = '') {
       ? quotes.find(q => q.toLowerCase() !== originalText.trim().toLowerCase()) || quotes[quotes.length - 1]
       : quotes[quotes.length - 1];
     if (candidate) cleaned = candidate;
+  } else if (/^[^"“\n]{3,}["“]([^"”\n]{2,})$/.test(cleaned)) {
+    cleaned = cleaned.replace(/^[^"“\n]{3,}["“]([^"”\n]{2,})$/, '$1');
   }
 
   cleaned = cleaned
     .replace(/^["'`]+|["'`]+$/g, '')
     .trim()
+    .replace(/^([^\s,]+માં|In [A-Za-z]+),?\s*(તે હશે|it would be|it is|it will be)\s*["'`:]*\s*/iu, '')
     .replace(/^([^\s:ઃ]+(\s+[^\s:ઃ]+)*\s*[:ઃ]\s*)/u, '')
-    .replace(/^(गूज्लिश|gujlish|hinglish|હિંગ્લિશ|ગુજ્લિશ)[,:\s]+/iu, '')
+    .replace(/^(गूज्लिश|gujlish|hinglish|હિંગ્લિશ|ગુજ્લિશ|banglish|tenglish|tanglish|kanglish|manglish|romaji|greeklish|arabizi)[,:\s]+/iu, '')
     .trim()
     .replace(/^["'`]+|["'`]+$/g, '')
     .replace(/\s*(Note|Explanation|Breakdown|Pronunciation):[\s\S]*$/i, '')
@@ -222,10 +229,9 @@ export async function translateText({ text, target_lang, source_lang = 'auto', t
     };
   }
 
-  // Map Romanized dialects to core Indic languages for the neural model
-  let modelTarget = target;
-  if (target === 'gujlish') modelTarget = 'gujarati';
-  else if (target === 'hinglish') modelTarget = 'hindi';
+  // Map Romanized dialects to core languages for the neural model
+  const isDialect = isRomanizedDialect(target);
+  const modelTarget = isDialect ? (DIALECT_TO_CORE_LANG[target] || target) : target;
 
   // 2. Neural Model Translation (Ollama or OpenAI-compatible)
   try {
@@ -240,11 +246,9 @@ export async function translateText({ text, target_lang, source_lang = 'auto', t
 
     let translated = cleanOutput(rawOutput, modelTarget, text);
 
-    // If Romanized dialect requested, transliterate Indic script to Latin
-    if (target === 'gujlish' && (detectLanguage(translated) === 'gujarati' || /[\u0A80-\u0AFF]/.test(translated))) {
-      translated = gujaratiToGujlish(translated);
-    } else if (target === 'hinglish' && (detectLanguage(translated) === 'devanagari' || /[\u0900-\u097F]/.test(translated))) {
-      translated = devanagariToHinglish(translated);
+    // If Romanized dialect requested, transliterate the native script to Latin
+    if (isDialect) {
+      translated = transliterateText(translated, target);
     }
 
     return {
