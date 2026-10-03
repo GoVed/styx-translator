@@ -152,6 +152,22 @@ await testAsync('Engine: translates English to conversational Gujlish (Latin scr
   assert.strictEqual(detectLanguage(res.translated), 'latin');
 });
 
+await testAsync('Engine: context-aware translation with respect and gender parameters', async () => {
+  const res = await translateText({
+    text: 'Are you coming today?',
+    target_lang: 'gujlish',
+    context: {
+      formality: 'respectful',
+      relationship: 'elder uncle',
+      recipient_gender: 'male',
+      speaker_gender: 'male'
+    }
+  });
+  assert.strictEqual(res.provider, 'model');
+  assert.ok(res.translated.length > 0);
+  assert.strictEqual(res.context.formality, 'respectful');
+});
+
 // 6. MCP Protocol Tests
 test('MCP: definitions schema is universal', () => {
   assert.ok(Array.isArray(TOOL_DEFINITIONS));

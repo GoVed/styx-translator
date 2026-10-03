@@ -79,7 +79,7 @@ export function cleanOutput(raw, targetLang, originalText = '') {
  * @param {string} tone
  * @returns {{ system: string, prompt: string, stop: string[] }}
  */
-function buildPrompt(text, targetLang, sourceLang, tone = 'natural') {
+function buildPrompt(text, targetLang, sourceLang, tone = 'natural', context = null) {
   const toneMap = {
     natural: 'natural, fluent conversational style',
     casual: 'casual, informal everyday chat style',
@@ -93,8 +93,39 @@ function buildPrompt(text, targetLang, sourceLang, tone = 'natural') {
     ? ` from ${sourceLang}`
     : '';
 
+  let contextDirectives = '';
+  if (context) {
+    if (typeof context === 'string' && context.trim()) {
+      contextDirectives = `\nSociolinguistic Context: ${context.trim()}`;
+    } else if (typeof context === 'object') {
+      const rules = [];
+      if (context.formality) {
+        const isFormal = /formal|respect|honor|elder|senior/i.test(context.formality);
+        rules.push(`Respect & Honorific Tier: ${context.formality} (${isFormal ? 'use respectful/honorific pronouns and verb forms such as tame/aap/vous/Usted/Sie' : 'use familiar/informal pronouns and verb forms such as tu/tum/du'})`);
+      }
+      if (context.recipient_gender) {
+        rules.push(`Recipient Gender: ${context.recipient_gender} (conjugate 2nd-person verbs and adjectives to match recipient)`);
+      }
+      if (context.speaker_gender) {
+        rules.push(`Speaker Gender: ${context.speaker_gender} (conjugate 1st-person verbs to match speaker)`);
+      }
+      if (context.relationship) {
+        rules.push(`Relationship to Recipient: ${context.relationship}`);
+      }
+      if (context.age_group || context.age) {
+        rules.push(`Age Tier: ${context.age_group || context.age}`);
+      }
+      if (context.additional_notes || context.notes) {
+        rules.push(`Situational Notes: ${context.additional_notes || context.notes}`);
+      }
+      if (rules.length > 0) {
+        contextDirectives = `\nSociolinguistic Context (Grammar & Honorifics Agreement):\n${rules.map(r => `- ${r}`).join('\n')}`;
+      }
+    }
+  }
+
   const system = `You are a universal multilingual translator and localization engine. Translate the provided text${srcLabel} into ${targetLang}. For romanized regional dialects (e.g. Gujlish, Hinglish), translate the colloquial meaning accurately into ${targetLang}.
-Style: Use a ${toneDesc}.
+Style: Use a ${toneDesc}.${contextDirectives}
 Formatting: Output ONLY the direct translation. Never include explanations, grammar breakdowns, notes, pronunciation guides, or quotation marks.`;
 
   const prompt = `Translate to ${targetLang}: "${text}"`;
@@ -180,7 +211,7 @@ async function callOpenAiCompatible(system, prompt, stop) {
  * @param {object} [params.glossary]
  * @returns {Promise<object>}
  */
-export async function translateText({ text, target_lang, source_lang = 'auto', tone = 'natural', glossary = null }) {
+export async function translateText({ text, target_lang, source_lang = 'auto', tone = 'natural', glossary = null, context = null }) {
   if (!text || !text.trim()) {
     return { translated: '', source_lang, target_lang, provider: 'none', latency_ms: 0 };
   }
@@ -235,7 +266,7 @@ export async function translateText({ text, target_lang, source_lang = 'auto', t
 
   // 2. Neural Model Translation (Ollama or OpenAI-compatible)
   try {
-    const { system, prompt, stop } = buildPrompt(text, modelTarget, detectedSource, tone);
+    const { system, prompt, stop } = buildPrompt(text, modelTarget, detectedSource, tone, context);
     let rawOutput = '';
 
     if (config.backend === 'openai_compatible') {
@@ -255,6 +286,7 @@ export async function translateText({ text, target_lang, source_lang = 'auto', t
       translated: translated || text,
       source_lang: detectedSource,
       target_lang: target,
+      ...(context ? { context } : {}),
       model: config.translationModel,
       backend: config.backend,
       provider: 'model',

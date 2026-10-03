@@ -78,19 +78,31 @@ The **Translator Tool** (`translate`) is an open, generic translation and locali
   - `"business"`: Professional enterprise terminology.
   - `"slang"`: Colloquial slang.
 - **`glossary`** *(object, optional)*: Key-value terms to preserve or enforce verbatim (e.g., `{"Styx": "Styx", "Agent OS": "Agent OS"}`).
+- **`context`** *(object or string, optional)*: Sociolinguistic and cultural context. Unlike English, foreign languages change grammar, pronouns, and verb conjugations based on honorifics and gender:
+  - `formality` *(string)*: `"respectful"` / `"formal"` / `"honorific"` (use `tame` in Gujarati, `aap` in Hindi, `vous` in French, `Usted` in Spanish, `Sie` in German) vs `"casual"` / `"informal"` / `"peer"` (use `tu` / `tum` / `du`).
+  - `recipient_gender` *(string)*: `"female"` or `"male"` (governs 2nd-person gendered verbs and adjectives).
+  - `speaker_gender` *(string)*: `"female"` or `"male"` (governs 1st-person verb conjugations).
+  - `relationship` *(string)*: Social dynamic, e.g. `"elder sister"`, `"mother"`, `"boss"`, `"client"`, `"close friend"`, `"younger brother"`.
+  - `age_group` *(string)*: `"elder"`, `"peer"`, `"junior"`, `"child"`.
+  - `additional_notes` *(string)*: Any situational nuance.
 
 ---
 
 ## Examples
 
-### 1. English to Spanish (Formal Business)
-- **Input**: `text: "We appreciate your partnership. The contract is attached.", target_lang: "spanish", tone: "business"`
+### 1. English to Gujlish (Respectful Elder vs Casual Friend)
+- **Input (Elder Uncle)**:
+  `text: "Are you coming today?", target_lang: "gujlish", context: { formality: "respectful", relationship: "elder uncle", recipient_gender: "male" }`
+  ➔ **Output**: `"Tame aaje aavsho?"`
+- **Input (Casual Peer Friend)**:
+  `text: "Are you coming today?", target_lang: "gujlish", context: { formality: "casual", relationship: "friend", recipient_gender: "female" }`
+  ➔ **Output**: `"Tu aaje aavish?"`
+
+### 2. English to Hinglish (Gender Agreement)
+- **Input (Female Speaker to Male Colleague)**:
+  `text: "I am working on it now, will let you know.", target_lang: "hinglish", context: { speaker_gender: "female", recipient_gender: "male", formality: "peer" }`
+  ➔ **Output**: `"Main abhi ispar kaam kar rahi hoon, aapko bataoongi."`
+
+### 3. English to Spanish (Formal Business vs Informal)
+- **Input**: `text: "We appreciate your partnership. The contract is attached.", target_lang: "spanish", tone: "business", context: { formality: "formal" }`
 - **Output**: `"Agradecemos su colaboración. El contrato se encuentra adjunto."`
-
-### 2. English to Gujlish (Casual Chat)
-- **Input**: `text: "What are you doing today? Let us meet in the evening.", target_lang: "gujlish", tone: "casual"`
-- **Output**: `"Aaje shu karo cho? Sanje maliye."`
-
-### 3. French to English (Auto-Detect)
-- **Input**: `text: "Bonjour, est-ce que la réunion a été reportée?", target_lang: "english"`
-- **Output**: `"Hello, has the meeting been postponed?"`
