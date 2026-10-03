@@ -1,0 +1,31 @@
+{
+  "name": "@styx-tools/translator",
+  "version": "1.1.0",
+  "description": "Universal Multi-Language Neural Translator Tool for Styx Agent OS",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "styx-translator": "./bin/styx-translator"
+  },
+  "scripts": {
+    "start": "node src/index.js daemon",
+    "test": "node tests/translator.test.js"
+  },
+  "keywords": [
+    "styx",
+    "translator",
+    "multilingual",
+    "localization",
+    "mcp",
+    "model-context-protocol",
+    "agent-os"
+  ],
+  "author": "Styx Community",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^13.1.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pino": "^9.6.0"
+  }
+}

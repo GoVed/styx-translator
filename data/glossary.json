@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "description": "User-configurable terminology overrides (empty by default).",
+  "phrases": [],
+  "terms": {
+    "nikadyo hu": "I have left / I am on my way",
+    "nikadya": "left / on the way",
+    "nikadyo": "left / on the way",
+    "nikalyo hu": "I have left / I am on my way",
+    "nikalyo": "left / on the way",
+    "shu kare che": "what are you doing",
+    "shu chale che": "what's going on",
+    "kai vandho nai": "no problem / no worries",
+    "aaje maliye": "let's meet today",
+    "kem cho": "how are you",
+    "badha": "everyone",
+    "hu aavu chu": "I am coming",
+    "jaldi aav": "come quickly",
+    "wait karu chu": "I am waiting",
+    "i have left": "nikadyo hu",
+    "i am on my way": "nikadyo hu",
+    "come quickly": "jaldi aav",
+    "i am waiting": "wait karu chu",
+    "no problem": "kai vandho nai",
+    "what are you doing": "shu kare che",
+    "what's going on": "shu chale che"
+  }
+}

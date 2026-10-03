@@ -1,0 +1,19 @@
+{
+  "name": "translator",
+  "display_name": "Universal Multi-Language Translator",
+  "version": "1.1.0",
+  "description": "High-performance, generic multilingual translator supporting 50+ languages, conversational dialects (Gujlish, Hinglish, etc.), custom user glossaries, and pluggable backends (Ollama, vLLM, OpenAI).",
+  "container_name": "styx-translator-connector",
+  "port": 8772,
+  "protocol": "translator",
+  "instructions_file": "instructions.md",
+  "has_docker": true,
+  "tools": [
+    {
+      "name": "translate",
+      "description": "Translate text between any languages worldwide (English, Spanish, French, German, Japanese, Chinese, Hindi, Gujarati, Arabic, etc.) and colloquial chat dialects (Gujlish, Hinglish) with customizable tone and glossaries.",
+      "risk_level": "LOW",
+      "policy": "AUTONOMOUS"
+    }
+  ]
+}
